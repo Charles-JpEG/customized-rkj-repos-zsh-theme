@@ -130,5 +130,5 @@ bindkey '^L' custom_clear_screen
 
 # alternate prompt with git & hg
 PROMPT=$'%{$fg_bold[blue]%}┌─[$(mygit)$(hg_prompt_info)%{$fg_bold[blue]%}] - %{$fg_bold[blue]%}[%{$fg_bold[default]%}%~%{$fg_bold[blue]%}]%{$reset_color%} - %{$fg_bold[blue]%}[%b%{$fg[yellow]%}'%D{"%Y-%m-%d %H:%M:%S"}%b$'%{$fg_bold[blue]%}]
-%{$fg_bold[blue]%}└─[%{$fg_bold[green]%}%n%{$fg_bold[blue]%}] - [%{$fg_bold[magenta]%}%?%{$fg_bold[blue]%}]%{$reset_color%} '
+%{$fg_bold[blue]%}└─[%{$fg_bold[green]%}%n%{$fg_bold[blue]%}] - %(?:%{$fg_bold[blue]%}:%{$fg_bold[red]%})[%{$fg_bold[magenta]%}%?%(?:%{$fg_bold[blue]%}:%{$fg_bold[red]%})]%{$reset_color%} '
 PS2=$' \e[0;34m%}%B>%{\e[0m%}%b '
