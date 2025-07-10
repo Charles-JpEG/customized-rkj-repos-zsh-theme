@@ -69,9 +69,28 @@ function mygit() {
   }
 }
 
-function retcode() {}
+# Custom clear function that mimics Cmd+K behavior
+function custom_clear_screen() {
+  # Clear the screen and scrollback buffer (like Cmd+K on macOS)
+  if [[ "$OSTYPE" == darwin* ]]; then
+    # On macOS, use the native clear with scrollback
+    printf '\e[3J\e[H\e[2J'
+  else
+    # On other systems, clear screen and move cursor to top
+    printf '\e[3J\e[H\e[2J'
+  fi
+  
+  # Reset the prompt
+  zle reset-prompt
+}
+
+# Create a ZLE widget for the custom clear function
+zle -N custom_clear_screen
+
+# Bind Ctrl+L to the custom clear function
+bindkey '^L' custom_clear_screen
 
 # alternate prompt with git & hg
 PROMPT=$'%{$fg_bold[blue]%}┌─[$(mygit)$(hg_prompt_info)%{$fg_bold[blue]%}] - %{$fg_bold[blue]%}[%{$fg_bold[default]%}%~%{$fg_bold[blue]%}]%{$reset_color%} - %{$fg_bold[blue]%}[%b%{$fg[yellow]%}'%D{"%Y-%m-%d %H:%M:%S"}%b$'%{$fg_bold[blue]%}]
-%{$fg_bold[blue]%}└─[%{$fg_bold[green]%}%n%b%{$fg[black]%}@%{$fg[cyan]%}%m%{$fg_bold[blue]%}] - [%{$fg_bold[magenta]%}%?$(retcode)%{$fg_bold[blue]%}]%{$reset_color%} '
+%{$fg_bold[blue]%}└─[%{$fg_bold[green]%}%n%{$fg_bold[blue]%}] - [%{$fg_bold[magenta]%}%?%{$fg_bold[blue]%}]%{$reset_color%} '
 PS2=$' \e[0;34m%}%B>%{\e[0m%}%b '
