@@ -1,6 +1,6 @@
 # Customized rkj-repos ZSH Theme
 
-This project is a customized rkj-repos zsh-theme that works elegantly with macOS cmd-k shortcut.
+This project is a customized rkj-repos zsh-theme.
 
 ## Overview
 
