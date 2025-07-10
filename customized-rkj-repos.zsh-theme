@@ -10,26 +10,68 @@ patches: <patches|join( → )|pre_applied(%{$fg[yellow]%})|post_applied(%{$reset
   fi
 }
 
-ZSH_THEME_GIT_PROMPT_ADDED="%{$fg[cyan]%}+"
-ZSH_THEME_GIT_PROMPT_MODIFIED="%{$fg[yellow]%}✱"
-ZSH_THEME_GIT_PROMPT_DELETED="%{$fg[red]%}✗"
-ZSH_THEME_GIT_PROMPT_RENAMED="%{$fg[blue]%}➦"
-ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg[magenta]%}✂"
-ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg[blue]%}✈"
-ZSH_THEME_GIT_PROMPT_SHA_BEFORE=" %{$fg[blue]%}"
+ZSH_THEME_GIT_PROMPT_ADDED="%{$fg_bold[green]%}+"
+ZSH_THEME_GIT_PROMPT_MODIFIED="%{$fg_bold[yellow]%}✱"
+ZSH_THEME_GIT_PROMPT_DELETED="%{$fg_bold[red]%}✗"
+ZSH_THEME_GIT_PROMPT_RENAMED="%{$fg_bold[cyan]%}➦"
+ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg_bold[magenta]%}✂"
+ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg_bold[blue]%}✈"
+ZSH_THEME_GIT_PROMPT_SHA_BEFORE=" %{$fg_bold[cyan]%}"
 ZSH_THEME_GIT_PROMPT_SHA_AFTER="%{$reset_color%}"
 
-function mygit() {
-  if [[ "$(git config --get oh-my-zsh.hide-status)" != "1" ]]; then
-    ref=$(command git symbolic-ref HEAD 2> /dev/null) || \
-    ref=$(command git rev-parse --short HEAD 2> /dev/null) || return
-    echo "$ZSH_THEME_GIT_PROMPT_PREFIX${ref#refs/heads/}$(git_prompt_short_sha)$(git_prompt_status)%{$fg_bold[blue]%}$ZSH_THEME_GIT_PROMPT_SUFFIX "
+# Enhanced git status function with more information
+function git_prompt_info_enhanced() {
+  local ref
+  if [[ "$(git config --get oh-my-zsh.hide-status)" == "1" ]]; then
+    return
   fi
+  
+  ref=$(command git symbolic-ref HEAD 2> /dev/null) || \
+  ref=$(command git rev-parse --short HEAD 2> /dev/null) || return
+  
+  local branch_name="${ref#refs/heads/}"
+  local git_status=""
+  local ahead_behind=""
+  
+  # Check if we're ahead/behind remote
+  local upstream=$(git rev-parse --abbrev-ref @{upstream} 2>/dev/null)
+  if [[ -n "$upstream" ]]; then
+    local ahead=$(git rev-list --count HEAD..@{upstream} 2>/dev/null)
+    local behind=$(git rev-list --count @{upstream}..HEAD 2>/dev/null)
+    
+    if [[ "$ahead" -gt 0 ]] && [[ "$behind" -gt 0 ]]; then
+      ahead_behind=" %{$fg_bold[yellow]%}↕$behind↑$ahead↓%{$reset_color%}"
+    elif [[ "$ahead" -gt 0 ]]; then
+      ahead_behind=" %{$fg_bold[red]%}↓$ahead%{$reset_color%}"
+    elif [[ "$behind" -gt 0 ]]; then
+      ahead_behind=" %{$fg_bold[green]%}↑$behind%{$reset_color%}"
+    fi
+  fi
+  
+  # Check for stashes
+  local stash_count=$(git stash list 2>/dev/null | wc -l | tr -d ' ')
+  local stash_info=""
+  if [[ "$stash_count" -gt 0 ]]; then
+    stash_info=" %{$fg_bold[magenta]%}⚑$stash_count%{$reset_color%}"
+  fi
+  
+  echo "%{$fg_bold[cyan]%}git:(%{$fg_bold[green]%}${branch_name}$(git_prompt_short_sha)$(git_prompt_status)%{$fg_bold[cyan]%})${ahead_behind}${stash_info}%{$reset_color%}"
+}
+
+# Use the enhanced git function, but keep the original as fallback
+function mygit() {
+  git_prompt_info_enhanced 2>/dev/null || {
+    if [[ "$(git config --get oh-my-zsh.hide-status)" != "1" ]]; then
+      ref=$(command git symbolic-ref HEAD 2> /dev/null) || \
+      ref=$(command git rev-parse --short HEAD 2> /dev/null) || return
+      echo "%{$fg_bold[cyan]%}git:(%{$fg_bold[green]%}${ref#refs/heads/}$(git_prompt_short_sha)$(git_prompt_status)%{$fg_bold[cyan]%})%{$reset_color%}"
+    fi
+  }
 }
 
 function retcode() {}
 
 # alternate prompt with git & hg
-PROMPT=$'%{$fg_bold[blue]%}┌─[%{$fg_bold[green]%}%n%b%{$fg[black]%}@%{$fg[cyan]%}%m%{$fg_bold[blue]%}]%{$reset_color%} - %{$fg_bold[blue]%}[%{$fg_bold[default]%}%~%{$fg_bold[blue]%}]%{$reset_color%} - %{$fg_bold[blue]%}[%b%{$fg[yellow]%}'%D{"%Y-%m-%d %I:%M:%S"}%b$'%{$fg_bold[blue]%}]
-%{$fg_bold[blue]%}└─[%{$fg_bold[magenta]%}%?$(retcode)%{$fg_bold[blue]%}] <$(mygit)$(hg_prompt_info)>%{$reset_color%} '
+PROMPT=$'%{$fg_bold[blue]%}┌─[$(mygit)$(hg_prompt_info)%{$fg_bold[blue]%}] - %{$fg_bold[blue]%}[%{$fg_bold[default]%}%~%{$fg_bold[blue]%}]%{$reset_color%} - %{$fg_bold[blue]%}[%b%{$fg[yellow]%}'%D{"%Y-%m-%d %I:%M:%S"}%b$'%{$fg_bold[blue]%}]
+%{$fg_bold[blue]%}└─[%{$fg_bold[green]%}%n%b%{$fg[black]%}@%{$fg[cyan]%}%m%{$fg_bold[blue]%}] - [%{$fg_bold[magenta]%}%?$(retcode)%{$fg_bold[blue]%}]%{$reset_color%} '
 PS2=$' \e[0;34m%}%B>%{\e[0m%}%b '
