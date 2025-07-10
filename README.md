@@ -1,39 +1,48 @@
 # Customized rkj-repos ZSH Theme
 
-This project is a customized rkj-repos zsh-theme that works elegantly with macOS cmd-k shortcut.
+This project is a customized rkj-repos zsh-theme with enhanced Git and Mercurial integration features.
 
 ## Overview
 
-This is a customized version of the popular rkj-repos Oh My Zsh theme with enhanced functionality for better cross-platform compatibility, particularly optimized for macOS terminal behavior. The theme maintains the elegant two-line prompt format while adding intelligent clear screen handling that preserves prompt state across different operating systems.
+This is a customized version of the popular rkj-repos Oh My Zsh theme with enhanced Git status functionality and comprehensive repository information display. The theme maintains the elegant two-line prompt format while adding advanced Git features including remote tracking status, stash indicators, and detailed working directory information. It also includes robust Mercurial support for mixed-VCS environments.
 
 ## Features
 
 ### Visual Elements
-- **Two-line prompt layout** for better readability and easier grep searching
-- **Git integration** with branch display and status indicators
-- **Mercurial (hg) support** with comprehensive repository information
-- **Color-coded status indicators**:
+- **Two-line prompt layout** for better readability and easier vgrepping
+- **Enhanced Git integration** with comprehensive status information:
+  - Branch name display
+  - Working directory status indicators
+  - Remote tracking information (ahead/behind commits)
+  - Stash count display
+  - Commit SHA display
+- **Mercurial (hg) support** with detailed repository information including:
+  - Branch and bookmark information
+  - Tags display
+  - Status indicators for modified and unknown files
+  - Patch queue information
+- **Color-coded Git status indicators**:
   - ✱ Modified files (yellow)
   - ✗ Deleted files (red)
   - + Added files (green)
   - ➦ Renamed files (cyan)
   - ✂ Unmerged files (magenta)
   - ✈ Untracked files (blue)
-- **Timestamp display** showing current date and time
+- **Advanced Git status features**:
+  - ↑ Commits ahead of remote (green)
+  - ↓ Commits behind remote (red)
+  - ↕ Diverged from remote (yellow)
+  - ⚑ Stash count indicator (magenta)
+- **Timestamp display** showing current date and time in format: YYYY-MM-DD HH:MM:SS
 - **User and host information** with colorful styling
-- **Exit code display** for the last command
+- **Exit code display** for the last command with color coding
 
-### Cross-Platform Terminal Compatibility
-- **macOS Cmd+K optimization**: Seamless integration with macOS terminal's Cmd+K shortcut
-- **Linux terminal support**: Enhanced clear behavior for various Linux terminal emulators
-- **Windows compatibility**: Support for Git Bash, WSL, and other Windows terminal environments
-- **Smart clear screen handling**: Preserves prompt state after terminal clear operations
-
-### Technical Enhancements
-- Platform detection and adaptive behavior
-- Custom ZLE widgets for improved terminal interaction
-- Precmd hooks for consistent prompt rendering
-- Fallback mechanisms for different shell environments
+### Technical Features
+- **Enhanced Git function** with fallback to basic Git info for reliability
+- **Robust error handling** for Git operations
+- **Configurable Git status** respecting oh-my-zsh.hide-status setting
+- **Optimized performance** with efficient Git command execution
+- **Unicode symbol support** for modern terminal compatibility
 
 ## Installation
 
@@ -104,42 +113,82 @@ You can customize various aspects of the theme by modifying the theme file:
 ZSH_THEME_GIT_PROMPT_ADDED="%{$fg_bold[green]%}+"
 ZSH_THEME_GIT_PROMPT_MODIFIED="%{$fg_bold[yellow]%}✱"
 ZSH_THEME_GIT_PROMPT_DELETED="%{$fg_bold[red]%}✗"
-# ... and more
+ZSH_THEME_GIT_PROMPT_RENAMED="%{$fg_bold[cyan]%}➦"
+ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg_bold[magenta]%}✂"
+ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg_bold[blue]%}✈"
+ZSH_THEME_GIT_PROMPT_SHA_BEFORE=" %{$fg_bold[cyan]%}"
+ZSH_THEME_GIT_PROMPT_SHA_AFTER="%{$reset_color%}"
 ```
+
+### Advanced Git Status Indicators
+The theme includes enhanced Git status indicators:
+- **↑** - Commits ahead of remote (green)
+- **↓** - Commits behind remote (red) 
+- **↕** - Diverged from remote (yellow)
+- **⚑** - Stash count (magenta)
 
 ### Colors and Styling
 The theme uses Oh My Zsh's color system. You can modify colors by changing the `$fg[color]` and `$fg_bold[color]` values throughout the theme file.
 
-## Platform-Specific Features
+### Prompt Layout
+The theme features a two-line prompt structure:
+- **Top line**: Git/Hg info, current directory path, timestamp
+- **Bottom line**: Username@hostname, exit code
 
-### macOS
-- Optimized for Terminal.app and iTerm2
-- Proper handling of Cmd+K clear behavior
-- Enhanced scrollback buffer management
+### Disabling Git Status
+To hide Git status information, set:
+```bash
+git config --global oh-my-zsh.hide-status 1
+```
 
-### Linux
-- Compatible with popular terminal emulators (GNOME Terminal, Konsole, Alacritty, etc.)
-- Optimized clear screen handling for various distributions
+## Usage
 
-### Windows
-- Support for Git Bash, Windows Terminal, and WSL environments
-- Consistent behavior across different Windows terminal applications
+Once installed, the theme will automatically:
+- Display your current Git branch and status when in a Git repository
+- Show enhanced Git information including:
+  - Commits ahead/behind remote tracking branch
+  - Stash count if stashes are present
+  - Detailed working directory status
+- Show Mercurial information when in an Hg repository with proper configuration
+- Provide timestamp information on each prompt
+- Display exit codes for failed commands
+
+### Git Repository Information
+When you're in a Git repository, the prompt displays:
+- **Branch name** in green
+- **Status indicators** for modified, added, deleted files
+- **Remote tracking status** with ahead/behind commit counts
+- **Stash indicator** if you have stashed changes
+- **Commit SHA** (short form)
+
+### Mercurial Repository Information
+For Mercurial repositories (requires hgext.prompt extension):
+- Branch and bookmark information
+- Tags display
+- Working directory status
+- Patch queue information
 
 ## Troubleshooting
 
 ### Prompt Not Displaying Correctly
 - Ensure Oh My Zsh is properly installed
-- Verify the theme file is in the correct location
-- Check that your terminal supports color output
+- Verify the theme file is in the correct location (`~/.oh-my-zsh/custom/themes/`)
+- Check that your terminal supports color output and Unicode characters
 
 ### Git Information Not Showing
 - Verify you're in a Git repository
 - Ensure Git is installed and accessible in your PATH
 - Check that `git config --get oh-my-zsh.hide-status` is not set to "1"
+- Verify that your Git repository has a valid remote configured for ahead/behind indicators
 
-### Clear Screen Issues
-- The theme automatically detects your platform and configures appropriate clear behavior
-- If issues persist, try manually sourcing your `.zshrc` file
+### Mercurial Information Not Showing
+- Ensure Mercurial is installed and accessible
+- Verify you have the `hgext.prompt` extension enabled in your `~/.hgrc`
+- Check that you're in a valid Mercurial repository
+
+### Performance Issues
+- The enhanced Git status may be slower in very large repositories
+- Consider disabling Git status globally if needed: `git config --global oh-my-zsh.hide-status 1`
 
 ## Contributing
 
@@ -161,10 +210,14 @@ This theme is based on the original rkj-repos theme from Oh My Zsh. Please refer
 ## Changelog
 
 ### Latest Version
-- Enhanced macOS Cmd+K compatibility
-- Cross-platform clear screen optimization
-- Improved prompt preservation mechanisms
-- Better error handling and fallback options
+- Enhanced Git status function with comprehensive repository information
+- Added remote tracking status (ahead/behind commits) with visual indicators
+- Integrated stash count display with ⚑ symbol
+- Improved error handling and fallback mechanisms for Git operations
+- Added commit SHA display functionality
+- Enhanced Mercurial support with detailed repository information
+- Optimized performance for Git command execution
+- Added respect for oh-my-zsh.hide-status configuration option
 
 ---
 
