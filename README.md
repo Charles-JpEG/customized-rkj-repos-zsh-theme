@@ -11,38 +11,44 @@ This is a customized version of the popular rkj-repos Oh My Zsh theme with enhan
 ### Visual Elements
 - **Two-line prompt layout** for better readability and easier vgrepping
 - **Enhanced Git integration** with comprehensive status information:
-  - Branch name display
-  - Working directory status indicators
+  - Branch name display in green
+  - Working directory status indicators with custom implementation
   - Remote tracking information (ahead/behind commits)
   - Stash count display
-  - Commit SHA display
+  - Commit SHA display in cyan
 - **Mercurial (hg) support** with detailed repository information including:
   - Branch and bookmark information
   - Tags display
   - Status indicators for modified and unknown files
   - Patch queue information
-- **Color-coded Git status indicators**:
-  - ✱ Modified files (yellow)
-  - ✗ Deleted files (red)
-  - + Added files (green)
+- **Smart Git status indicators**:
+  - ✓ Clean repository (green) - when everything is committed
+  - ✗ Modified files (yellow) - for uncommitted changes
+  - ✗ Deleted files (red) - for deleted files
+  - + Added files (green) - for staged files
+  - + Untracked files (red) - for new, untracked files
   - ➦ Renamed files (cyan)
   - ✂ Unmerged files (magenta)
-  - ✈ Untracked files (blue)
 - **Advanced Git status features**:
   - ↑ Commits ahead of remote (green)
   - ↓ Commits behind remote (red)
   - ↕ Diverged from remote (yellow)
   - ⚑ Stash count indicator (magenta)
-- **Timestamp display** showing current date and time in format: YYYY-MM-DD HH:MM:SS
-- **User and host information** with colorful styling
-- **Exit code display** for the last command with color coding
+- **Timestamp display** showing current date and time in 24-hour format: YYYY-MM-DD HH:MM:SS
+- **Compact user information** displaying only username (no hostname)
+- **Smart exit code display** with visual indicators:
+  - Blue brackets for successful commands (exit code 0)
+  - Bright red brackets for failed commands (exit code ≠ 0)
+  - Exit code number always displayed in magenta
 
 ### Technical Features
-- **Enhanced Git function** with fallback to basic Git info for reliability
-- **Robust error handling** for Git operations
+- **Custom Git status implementation** independent of Oh My Zsh Git functions
+- **Robust error handling** for Git operations with fallback mechanisms
 - **Configurable Git status** respecting oh-my-zsh.hide-status setting
-- **Optimized performance** with efficient Git command execution
+- **Custom clear screen functionality** with Ctrl+L binding that mimics Cmd+K behavior
+- **Cross-platform compatibility** with enhanced clear screen handling
 - **Unicode symbol support** for modern terminal compatibility
+- **Performance optimized** Git status checking
 
 ## Installation
 
@@ -111,32 +117,48 @@ You can customize various aspects of the theme by modifying the theme file:
 ### Git Status Symbols
 ```bash
 ZSH_THEME_GIT_PROMPT_ADDED="%{$fg_bold[green]%}+"
-ZSH_THEME_GIT_PROMPT_MODIFIED="%{$fg_bold[yellow]%}✱"
+ZSH_THEME_GIT_PROMPT_MODIFIED="%{$fg_bold[yellow]%}✗"
 ZSH_THEME_GIT_PROMPT_DELETED="%{$fg_bold[red]%}✗"
 ZSH_THEME_GIT_PROMPT_RENAMED="%{$fg_bold[cyan]%}➦"
 ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg_bold[magenta]%}✂"
-ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg_bold[blue]%}✈"
+ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg_bold[red]%}+"
+ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg_bold[green]%}✓"
 ZSH_THEME_GIT_PROMPT_SHA_BEFORE=" %{$fg_bold[cyan]%}"
 ZSH_THEME_GIT_PROMPT_SHA_AFTER="%{$reset_color%}"
 ```
 
+### Git Status Color Coding
+The theme uses an intuitive color system:
+- **Green** - Good/Clean states (✓ clean repo, + staged files)
+- **Red** - Issues that need attention (+ untracked files, ✗ deleted files)
+- **Yellow** - Changes in progress (✗ modified files)
+- **Cyan** - Informational (➦ renamed files, commit SHA)
+- **Magenta** - Special states (✂ unmerged files, ⚑ stashes)
+
 ### Advanced Git Status Indicators
-The theme includes enhanced Git status indicators:
 - **↑** - Commits ahead of remote (green)
 - **↓** - Commits behind remote (red) 
 - **↕** - Diverged from remote (yellow)
 - **⚑** - Stash count (magenta)
 
-### Colors and Styling
-The theme uses Oh My Zsh's color system. You can modify colors by changing the `$fg[color]` and `$fg_bold[color]` values throughout the theme file.
+### Exit Code Display
+- **Blue brackets** `[0]` - Successful command execution
+- **Bright red brackets** `[error_code]` - Failed command execution
+- Exit code number always in magenta for consistency
 
 ### Prompt Layout
-The theme features a two-line prompt structure:
-- **Top line**: Git/Hg info, current directory path, timestamp
-- **Bottom line**: Username@hostname, exit code
+The theme features a clean two-line prompt structure:
+- **Top line**: Git/Hg repository info, current directory path, timestamp
+- **Bottom line**: Username, exit code with color-coded brackets
+
+### Time Format
+The timestamp uses 24-hour format (HH:MM:SS) for precision and international compatibility.
+
+### Keyboard Shortcuts
+- **Ctrl+L**: Enhanced clear screen that mimics macOS Cmd+K behavior
 
 ### Disabling Git Status
-To hide Git status information, set:
+To hide Git status information globally:
 ```bash
 git config --global oh-my-zsh.hide-status 1
 ```
@@ -210,14 +232,16 @@ This theme is based on the original rkj-repos theme from Oh My Zsh. Please refer
 ## Changelog
 
 ### Latest Version
-- Enhanced Git status function with comprehensive repository information
-- Added remote tracking status (ahead/behind commits) with visual indicators
-- Integrated stash count display with ⚑ symbol
-- Improved error handling and fallback mechanisms for Git operations
-- Added commit SHA display functionality
-- Enhanced Mercurial support with detailed repository information
-- Optimized performance for Git command execution
-- Added respect for oh-my-zsh.hide-status configuration option
+- **Custom Git status implementation** - Independent of Oh My Zsh Git functions for better reliability
+- **Smart status indicators** - Green ✓ for clean repositories, intuitive color coding
+- **Enhanced exit code display** - Bright red brackets for errors, blue for success
+- **24-hour time format** - More precise and internationally compatible timestamp
+- **Compact user display** - Username only (no hostname) for cleaner prompt
+- **Custom clear screen function** - Ctrl+L mimics macOS Cmd+K behavior with scrollback clearing
+- **Improved Git status detection** - Comprehensive checking for all Git states
+- **Better color scheme** - Intuitive color coding with green for good states, red for issues
+- **Removed empty functions** - Cleaned up unnecessary `retcode()` function
+- **Performance optimizations** - Efficient Git command execution with proper error handling
 
 ---
 
