@@ -1,5 +1,3 @@
-# user, host, full path, and time/date on two lines for easier vgrepping
-
 function hg_prompt_info {
   if (( $+commands[hg] )) && [[ -e ~/.hgrc ]] && grep -q "prompt" ~/.hgrc; then
     hg prompt --angle-brackets "\
@@ -33,6 +31,22 @@ function git_prompt_info_enhanced() {
   local git_status=""
   local ahead_behind=""
   
+  # Get Git status with custom implementation
+  local status_output
+  status_output=$(git status --porcelain 2>/dev/null)
+  
+  if [[ -n "$status_output" ]]; then
+    # Check for different types of changes
+    echo "$status_output" | grep -q "^M " && git_status+="${ZSH_THEME_GIT_PROMPT_MODIFIED}"
+    echo "$status_output" | grep -q "^A " && git_status+="${ZSH_THEME_GIT_PROMPT_ADDED}"
+    echo "$status_output" | grep -q "^D " && git_status+="${ZSH_THEME_GIT_PROMPT_DELETED}"
+    echo "$status_output" | grep -q "^R " && git_status+="${ZSH_THEME_GIT_PROMPT_RENAMED}"
+    echo "$status_output" | grep -q "^??" && git_status+="${ZSH_THEME_GIT_PROMPT_UNTRACKED}"
+    echo "$status_output" | grep -q "^UU\|^AA\|^DD" && git_status+="${ZSH_THEME_GIT_PROMPT_UNMERGED}"
+    # Check for modified files in working directory
+    echo "$status_output" | grep -q "^ M\|^ D\|^ A" && git_status+="${ZSH_THEME_GIT_PROMPT_MODIFIED}"
+  fi
+  
   # Check if we're ahead/behind remote
   local upstream=$(git rev-parse --abbrev-ref @{upstream} 2>/dev/null)
   if [[ -n "$upstream" ]]; then
@@ -55,7 +69,14 @@ function git_prompt_info_enhanced() {
     stash_info=" %{$fg_bold[magenta]%}⚑$stash_count%{$reset_color%}"
   fi
   
-  echo "%{$fg_bold[cyan]%}git:(%{$fg_bold[green]%}${branch_name}$(git_prompt_short_sha)$(git_prompt_status)%{$fg_bold[cyan]%})${ahead_behind}${stash_info}%{$reset_color%}"
+  # Get short SHA
+  local short_sha=$(git rev-parse --short HEAD 2>/dev/null)
+  local sha_display=""
+  if [[ -n "$short_sha" ]]; then
+    sha_display="${ZSH_THEME_GIT_PROMPT_SHA_BEFORE}${short_sha}${ZSH_THEME_GIT_PROMPT_SHA_AFTER}"
+  fi
+  
+  echo "%{$fg_bold[cyan]%}git:(%{$fg_bold[green]%}${branch_name}${sha_display}${git_status}%{$fg_bold[cyan]%})${ahead_behind}${stash_info}%{$reset_color%}"
 }
 
 # Use the enhanced git function, but keep the original as fallback
@@ -64,7 +85,18 @@ function mygit() {
     if [[ "$(git config --get oh-my-zsh.hide-status)" != "1" ]]; then
       ref=$(command git symbolic-ref HEAD 2> /dev/null) || \
       ref=$(command git rev-parse --short HEAD 2> /dev/null) || return
-      echo "%{$fg_bold[cyan]%}git:(%{$fg_bold[green]%}${ref#refs/heads/}$(git_prompt_short_sha)$(git_prompt_status)%{$fg_bold[cyan]%})%{$reset_color%}"
+      
+      # Simple fallback with basic status
+      local branch_name="${ref#refs/heads/}"
+      local short_sha=$(git rev-parse --short HEAD 2>/dev/null)
+      local status_output=$(git status --porcelain 2>/dev/null)
+      local git_status=""
+      
+      if [[ -n "$status_output" ]]; then
+        git_status="${ZSH_THEME_GIT_PROMPT_MODIFIED}"
+      fi
+      
+      echo "%{$fg_bold[cyan]%}git:(%{$fg_bold[green]%}${branch_name} ${short_sha}${git_status}%{$fg_bold[cyan]%})%{$reset_color%}"
     fi
   }
 }
