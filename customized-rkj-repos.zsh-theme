@@ -9,11 +9,12 @@ patches: <patches|join( → )|pre_applied(%{$fg[yellow]%})|post_applied(%{$reset
 }
 
 ZSH_THEME_GIT_PROMPT_ADDED="%{$fg_bold[green]%}+"
-ZSH_THEME_GIT_PROMPT_MODIFIED="%{$fg_bold[yellow]%}✱"
+ZSH_THEME_GIT_PROMPT_MODIFIED="%{$fg_bold[yellow]%}✗"
 ZSH_THEME_GIT_PROMPT_DELETED="%{$fg_bold[red]%}✗"
 ZSH_THEME_GIT_PROMPT_RENAMED="%{$fg_bold[cyan]%}➦"
 ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg_bold[magenta]%}✂"
-ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg_bold[blue]%}✈"
+ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg_bold[red]%}+"
+ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg_bold[green]%}✓"
 ZSH_THEME_GIT_PROMPT_SHA_BEFORE=" %{$fg_bold[cyan]%}"
 ZSH_THEME_GIT_PROMPT_SHA_AFTER="%{$reset_color%}"
 
@@ -45,6 +46,9 @@ function git_prompt_info_enhanced() {
     echo "$status_output" | grep -q "^UU\|^AA\|^DD" && git_status+="${ZSH_THEME_GIT_PROMPT_UNMERGED}"
     # Check for modified files in working directory
     echo "$status_output" | grep -q "^ M\|^ D\|^ A" && git_status+="${ZSH_THEME_GIT_PROMPT_MODIFIED}"
+  else
+    # Repository is clean, show green tick
+    git_status="${ZSH_THEME_GIT_PROMPT_CLEAN}"
   fi
   
   # Check if we're ahead/behind remote
@@ -94,6 +98,8 @@ function mygit() {
       
       if [[ -n "$status_output" ]]; then
         git_status="${ZSH_THEME_GIT_PROMPT_MODIFIED}"
+      else
+        git_status="${ZSH_THEME_GIT_PROMPT_CLEAN}"
       fi
       
       echo "%{$fg_bold[cyan]%}git:(%{$fg_bold[green]%}${branch_name} ${short_sha}${git_status}%{$fg_bold[cyan]%})%{$reset_color%}"
