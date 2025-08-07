@@ -21,14 +21,12 @@ This is a customized version of the popular rkj-repos Oh My Zsh theme with enhan
   - Tags display
   - Status indicators for modified and unknown files
   - Patch queue information
-- **Smart Git status indicators**:
+- **Smart Git status indicators** with priority-based display:
   - ✓ Clean repository (green) - when everything is committed
-  - ✗ Modified files (yellow) - for uncommitted changes
-  - ✗ Deleted files (red) - for deleted files
-  - + Added files (green) - for staged files
-  - + Untracked files (red) - for new, untracked files
-  - ➦ Renamed files (cyan)
-  - ✂ Unmerged files (magenta)
+  - + New/untracked files (red) - highest priority with modified
+  - - Deleted files (red) - highest priority with new/untracked  
+  - ✗ Modified files (yellow) - shown only when no higher priority changes exist
+  - Note: + and - can appear together (+ displayed first), both have higher priority than ✗
 - **Advanced Git status features**:
   - ↑ Commits ahead of remote (green)
   - ↓ Commits behind remote (red)
@@ -118,9 +116,7 @@ You can customize various aspects of the theme by modifying the theme file:
 ```bash
 ZSH_THEME_GIT_PROMPT_ADDED="%{$fg_bold[green]%}+"
 ZSH_THEME_GIT_PROMPT_MODIFIED="%{$fg_bold[yellow]%}✗"
-ZSH_THEME_GIT_PROMPT_DELETED="%{$fg_bold[red]%}✗"
-ZSH_THEME_GIT_PROMPT_RENAMED="%{$fg_bold[cyan]%}➦"
-ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg_bold[magenta]%}✂"
+ZSH_THEME_GIT_PROMPT_DELETED="%{$fg_bold[red]%}-"
 ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg_bold[red]%}+"
 ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg_bold[green]%}✓"
 ZSH_THEME_GIT_PROMPT_SHA_BEFORE=" %{$fg_bold[cyan]%}"
@@ -129,11 +125,11 @@ ZSH_THEME_GIT_PROMPT_SHA_AFTER="%{$reset_color%}"
 
 ### Git Status Color Coding
 The theme uses an intuitive color system:
-- **Green** - Good/Clean states (✓ clean repo, + staged files)
-- **Red** - Issues that need attention (+ untracked files, ✗ deleted files)
-- **Yellow** - Changes in progress (✗ modified files)
-- **Cyan** - Informational (➦ renamed files, commit SHA)
-- **Magenta** - Special states (✂ unmerged files, ⚑ stashes)
+- **Green** - Good/Clean states (✓ clean repo)  
+- **Red** - High priority changes (+ new/untracked files, - deleted files)
+- **Yellow** - Lower priority changes (✗ modified files)
+- **Cyan** - Informational (commit SHA)
+- **Magenta** - Special states (⚑ stashes)
 
 ### Advanced Git Status Indicators
 - **↑** - Commits ahead of remote (green)

@@ -10,9 +10,7 @@ patches: <patches|join( → )|pre_applied(%{$fg[yellow]%})|post_applied(%{$reset
 
 ZSH_THEME_GIT_PROMPT_ADDED="%{$fg_bold[green]%}+"
 ZSH_THEME_GIT_PROMPT_MODIFIED="%{$fg_bold[yellow]%}✗"
-ZSH_THEME_GIT_PROMPT_DELETED="%{$fg_bold[red]%}✗"
-ZSH_THEME_GIT_PROMPT_RENAMED="%{$fg_bold[cyan]%}➦"
-ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg_bold[magenta]%}✂"
+ZSH_THEME_GIT_PROMPT_DELETED="%{$fg_bold[red]%}-"
 ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg_bold[red]%}+"
 ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg_bold[green]%}✓"
 ZSH_THEME_GIT_PROMPT_SHA_BEFORE=" %{$fg_bold[cyan]%}"
@@ -37,15 +35,32 @@ function git_prompt_info_enhanced() {
   status_output=$(git status --porcelain 2>/dev/null)
   
   if [[ -n "$status_output" ]]; then
-    # Check for different types of changes
-    echo "$status_output" | grep -q "^M " && git_status+="${ZSH_THEME_GIT_PROMPT_MODIFIED}"
-    echo "$status_output" | grep -q "^A " && git_status+="${ZSH_THEME_GIT_PROMPT_ADDED}"
-    echo "$status_output" | grep -q "^D " && git_status+="${ZSH_THEME_GIT_PROMPT_DELETED}"
-    echo "$status_output" | grep -q "^R " && git_status+="${ZSH_THEME_GIT_PROMPT_RENAMED}"
-    echo "$status_output" | grep -q "^??" && git_status+="${ZSH_THEME_GIT_PROMPT_UNTRACKED}"
-    echo "$status_output" | grep -q "^UU\|^AA\|^DD" && git_status+="${ZSH_THEME_GIT_PROMPT_UNMERGED}"
-    # Check for modified files in working directory
-    echo "$status_output" | grep -q "^ M\|^ D\|^ A" && git_status+="${ZSH_THEME_GIT_PROMPT_MODIFIED}"
+    # Priority-based status checking: + and - have same priority (both can exist), higher than modified
+    local has_added=false
+    local has_deleted=false
+    local has_untracked=false
+    local has_modified=false
+    
+    # Check for high-priority changes (+ and - can coexist)
+    echo "$status_output" | grep -q "^A " && has_added=true
+    echo "$status_output" | grep -q "^D \|^ D" && has_deleted=true
+    echo "$status_output" | grep -q "^??" && has_untracked=true
+    
+    # Check for modified files (lower priority) - excluding deleted files
+    echo "$status_output" | grep -q "^M \|^ M\|^ A" && has_modified=true
+    
+    # Display + before - (both high priority)
+    if $has_added || $has_untracked; then
+      git_status+="${ZSH_THEME_GIT_PROMPT_UNTRACKED}"
+    fi
+    if $has_deleted; then
+      git_status+="${ZSH_THEME_GIT_PROMPT_DELETED}"
+    fi
+    
+    # Only show modified if no high-priority changes
+    if ! $has_added && ! $has_deleted && ! $has_untracked && $has_modified; then
+      git_status+="${ZSH_THEME_GIT_PROMPT_MODIFIED}"
+    fi
   else
     # Repository is clean, show green tick
     git_status="${ZSH_THEME_GIT_PROMPT_CLEAN}"
