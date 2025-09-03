@@ -78,7 +78,7 @@ This is a customized version of the popular rkj-repos Oh My Zsh theme with enhan
 ### Method 2: Symlink Installation
 1. Clone this repository to your preferred location:
    ```bash
-   git clone [ORIGINAL_REPO_URL_PLACEHOLDER] ~/path/to/customized-rkj-repos-theme
+   git clone https://github.com/Charles-JpEG/customized-rkj-repos-zsh-theme.git ~/path/to/customized-rkj-repos-theme
    ```
 
 2. Create a symlink in your Oh My Zsh custom themes directory:
