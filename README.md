@@ -57,7 +57,7 @@ This is a customized version of the popular rkj-repos Oh My Zsh theme with enhan
 ### Method 1: Manual Installation
 1. Clone this repository:
    ```bash
-   git clone [ORIGINAL_REPO_URL_PLACEHOLDER] ~/.oh-my-zsh/custom/themes/customized-rkj-repos
+   git clone https://github.com/Charles-JpEG/customized-rkj-repos-zsh-theme.git ~/.oh-my-zsh/custom/themes/customized-rkj-repos
    ```
 
 2. Copy the theme file:
